@@ -64,6 +64,21 @@ return [
             ]) : [],
         ],
 
+        'mysql_allotment' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST_ALLOTMENT', '127.0.0.1'),
+            'port' => env('DB_PORT_ALLOTMENT', 3306),
+            'database' => env('DB_DATABASE_ALLOTMENT', 'smsonlin_vasa'),
+            'username' => env('DB_USERNAME_ALLOTMENT', 'root'),
+            'password' => env('DB_PASSWORD_ALLOTMENT', ''),
+            'unix_socket' => env('DB_SOCKET_ALLOTMENT', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

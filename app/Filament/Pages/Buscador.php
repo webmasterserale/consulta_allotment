@@ -8,6 +8,8 @@ use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class Buscador extends Page
 {
@@ -37,7 +39,24 @@ class Buscador extends Page
 
     public function mount(): void
     {
-        $this->mes = now()->format('Y-m');
+        $filtros = Cache::get($this->claveFiltros());
+
+        if (is_array($filtros)) {
+            $this->hotel = (int) ($filtros['hotel'] ?? 2);
+            $this->mes = (string) ($filtros['mes'] ?? '');
+            $this->noches = (int) ($filtros['noches'] ?? 1);
+            $this->adultos = (int) ($filtros['adultos'] ?? 2);
+            $this->ninos = (int) ($filtros['ninos'] ?? 0);
+        }
+
+        if ($this->mes === '' || ! array_key_exists($this->mes, $this->meses)) {
+            $this->mes = now()->format('Y-m');
+        }
+
+        // Al volver a la página se repite la última búsqueda con datos frescos
+        if (is_array($filtros)) {
+            $this->buscar();
+        }
     }
 
     public function getDestinosProperty(): array
@@ -83,6 +102,14 @@ class Buscador extends Page
             $this->hotel = 2;
         }
 
+        Cache::forever($this->claveFiltros(), [
+            'hotel' => $this->hotel,
+            'mes' => $this->mes,
+            'noches' => $this->noches,
+            'adultos' => $this->adultos,
+            'ninos' => $this->ninos,
+        ]);
+
         $paquetes = app(DisponibilidadAllotment::class)->paquetes(
             hotel: $this->hotel,
             mes: $this->mes,
@@ -110,6 +137,11 @@ class Buscador extends Page
                 ], $combinacion['unidades']),
             ], $paquete['combinaciones']),
         ], $paquetes);
+    }
+
+    private function claveFiltros(): string
+    {
+        return 'buscador.filtros.' . Auth::id();
     }
 
     private function formatearFecha(string $fecha): string

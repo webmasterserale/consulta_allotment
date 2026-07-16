@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Allotment extends Model
 {
+    protected $connection = 'mysql_allotment';
+    
     protected $table = 'allotment';
 
     protected $primaryKey = 'corr';

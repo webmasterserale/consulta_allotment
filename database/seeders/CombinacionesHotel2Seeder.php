@@ -11,7 +11,7 @@ class CombinacionesHotel2Seeder extends Seeder
 
     public function run(): void
     {
-        $tipos = DB::table('tipo_unid')
+        $tipos = DB::connection('mysql_allotment')->table('tipo_unid')
             ->where('hotel', self::HOTEL)
             ->whereIn('unidad', ['D2DL', 'D2JSE', 'STE', 'STL', 'B1BR', 'B2BR'])
             ->pluck('id', 'unidad');
@@ -152,15 +152,16 @@ class CombinacionesHotel2Seeder extends Seeder
             [8, 1, 7, $soloMaximas],
         ];
 
-        DB::transaction(function () use ($bloques, $u) {
+        DB::connection('mysql_allotment')->transaction(function () use ($bloques, $u) {
+            $conn = DB::connection('mysql_allotment');
             // Recarga limpia del hotel: el detalle se borra por cascada
-            DB::table('combinaciones')->where('hotel', self::HOTEL)->delete();
+            $conn->table('combinaciones')->where('hotel', self::HOTEL)->delete();
 
             $ahora = now();
 
             foreach ($bloques as [$total, $adultos, $ninos, $opciones]) {
                 foreach ($opciones as $indice => $opcion) {
-                    $combinacionId = DB::table('combinaciones')->insertGetId([
+                    $combinacionId = $conn->table('combinaciones')->insertGetId([
                         'hotel' => self::HOTEL,
                         'adultos' => $adultos,
                         'ninos' => $ninos,
@@ -180,7 +181,7 @@ class CombinacionesHotel2Seeder extends Seeder
                         ];
                     }
 
-                    DB::table('detalle_combinaciones')->insert($detalle);
+                    $conn->table('detalle_combinaciones')->insert($detalle);
                 }
             }
         });

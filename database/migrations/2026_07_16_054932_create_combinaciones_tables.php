@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('combinaciones', function (Blueprint $table) {
+        Schema::connection('mysql_allotment')->create('combinaciones', function (Blueprint $table) {
             $table->id();
             $table->integer('hotel');
             $table->unsignedTinyInteger('adultos');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->index(['hotel', 'adultos', 'ninos', 'activo'], 'idx_comb_hotel_pax');
         });
 
-        Schema::create('detalle_combinaciones', function (Blueprint $table) {
+        Schema::connection('mysql_allotment')->create('detalle_combinaciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('combinacion_id')->constrained('combinaciones')->cascadeOnDelete();
             $table->integer('tipo_unid_id');
@@ -40,7 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detalle_combinaciones');
-        Schema::dropIfExists('combinaciones');
+        Schema::connection('mysql_allotment')->dropIfExists('detalle_combinaciones');
+        Schema::connection('mysql_allotment')->dropIfExists('combinaciones');
     }
 };
