@@ -116,8 +116,8 @@ class CombinacionesHotel1Seeder extends Seeder
             [8, 2, 6, $chicasSiete],
         ];
 
-        DB::transaction(function () use ($bloques, $u) {
-            $conn = DB::connection();
+        DB::connection('mysql_allotment')->transaction(function () use ($bloques, $u) {
+            $conn = DB::connection('mysql_allotment');
             // Recarga limpia del hotel: el detalle se borra por cascada
             $conn->table('combinaciones')->where('hotel', self::HOTEL)->delete();
 
