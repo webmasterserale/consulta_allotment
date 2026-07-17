@@ -84,6 +84,11 @@ class Buscador extends Page
         return self::TIPOS_DIAS;
     }
 
+    public function getPuedeReservarProperty(): bool
+    {
+        return (bool) Auth::user()?->can('Reservar:Buscador');
+    }
+
     /**
      * Mes actual y los 5 siguientes, con etiqueta en español.
      */
@@ -179,6 +184,8 @@ class Buscador extends Page
      */
     public function reservar(array $corrs): void
     {
+        abort_unless($this->puedeReservar, 403);
+
         if ($corrs === []) {
             return;
         }

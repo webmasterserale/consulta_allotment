@@ -192,15 +192,17 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <button
-                                type="button"
-                                class="bsc-reservar"
-                                wire:click="reservar([{{ implode(',', $combinacion['corrs']) }}])"
-                                wire:loading.attr="disabled"
-                                wire:confirm="¿Simular reserva de esta combinación?"
-                            >
-                                Reservar
-                            </button>
+                            @if ($this->puedeReservar)
+                                <button
+                                    type="button"
+                                    class="bsc-reservar"
+                                    wire:click="reservar([{{ implode(',', $combinacion['corrs']) }}])"
+                                    wire:loading.attr="disabled"
+                                    wire:confirm="¿Simular reserva de esta combinación?"
+                                >
+                                    Reservar
+                                </button>
+                            @endif
                         </div>
                     @endforeach
                 </div>
