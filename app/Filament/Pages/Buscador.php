@@ -2,10 +2,12 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Allotment;
 use App\Services\BuscadorCombinaciones;
 use App\Services\DisponibilidadAllotment;
 use BackedEnum;
 use Carbon\CarbonImmutable;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
@@ -149,6 +151,13 @@ class Buscador extends Page
                 'prioridad' => $combinacion['prioridad'],
                 'descripcion' => $combinacion['descripcion'],
                 'disponibles' => $combinacion['disponibles'],
+                'corrs' => array_merge(
+                    [],
+                    ...array_map(
+                        fn (array $unidad) => array_column($unidad['tramos'], 'corr'),
+                        $combinacion['unidades'],
+                    ),
+                ),
                 'unidades' => array_map(fn (array $unidad) => [
                     'tipo' => $unidad['tipo'],
                     'tramos' => array_map(
@@ -161,6 +170,43 @@ class Buscador extends Page
                 ], $combinacion['unidades']),
             ], $paquete['combinaciones']),
         ], $paquetes);
+    }
+
+    /**
+     * Simula una reservación: bloquea en el allotment los registros de la
+     * combinación elegida (marca JUNTO/NOMBRE aleatorios y estado BLOQUEADA),
+     * para poder observar el impacto en la disponibilidad. Solo para pruebas.
+     */
+    public function reservar(array $corrs): void
+    {
+        if ($corrs === []) {
+            return;
+        }
+
+        $junto = (string) random_int(1000000, 9999999);
+        $nombre = $this->nombreAleatorio();
+
+        Allotment::query()->whereIn('corr', $corrs)->update([
+            'JUNTO' => $junto,
+            'NOMBRE' => $nombre,
+            'estado' => 'BLOQUEADA',
+        ]);
+
+        Notification::make()
+            ->title('Reserva simulada creada')
+            ->body("JUNTO {$junto} · {$nombre}")
+            ->success()
+            ->send();
+
+        $this->buscar();
+    }
+
+    private function nombreAleatorio(): string
+    {
+        $nombres = ['JUAN', 'MARIA', 'CARLOS', 'ANA', 'LUIS', 'SOFIA', 'PEDRO', 'LAURA', 'JORGE', 'PAOLA'];
+        $apellidos = ['GARCIA', 'RODRIGUEZ', 'LOPEZ', 'MARTINEZ', 'HERNANDEZ', 'GONZALEZ', 'PEREZ', 'SANCHEZ'];
+
+        return $nombres[array_rand($nombres)] . ' ' . $apellidos[array_rand($apellidos)] . ' ' . $apellidos[array_rand($apellidos)];
     }
 
     private function claveFiltros(): string

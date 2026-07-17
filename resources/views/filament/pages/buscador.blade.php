@@ -52,6 +52,9 @@
         .bsc-dia-opcion { padding: .55rem 1rem; border: 2px solid #2563a8; border-radius: 9999px; color: #2563a8; font-weight: 600; cursor: pointer; background: #fff; font-size: .9rem; }
         .dark .bsc-dia-opcion { background: transparent; border-color: #60a5fa; color: #93c5fd; }
         .bsc-dia-opcion.activo { background: #2563a8 !important; color: #fff !important; }
+        .bsc-reservar { margin-top: .6rem; padding: .45rem .9rem; border: none; border-radius: 9999px; background: #16a34a; color: #fff; font-weight: 700; font-size: .82rem; cursor: pointer; }
+        .bsc-reservar:hover { background: #15803d; }
+        .bsc-reservar:disabled { opacity: .6; cursor: wait; }
     </style>
 
     <div
@@ -189,6 +192,15 @@
                                     </div>
                                 @endforeach
                             </div>
+                            <button
+                                type="button"
+                                class="bsc-reservar"
+                                wire:click="reservar([{{ implode(',', $combinacion['corrs']) }}])"
+                                wire:loading.attr="disabled"
+                                wire:confirm="¿Simular reserva de esta combinación?"
+                            >
+                                Reservar
+                            </button>
                         </div>
                     @endforeach
                 </div>

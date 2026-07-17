@@ -42,7 +42,14 @@ class CombinacionsTable
                     ->label('Prioridad')
                     ->sortable(),
                 TextColumn::make('descripcion')
-                    ->label('Combinación'),
+                    ->label('Combinación')
+                    ->searchable(
+                        query: fn (Builder $query, string $search): Builder => $query->whereHas(
+                            'detalles.tipoUnid',
+                            fn (Builder $q) => $q->where('nombre', 'like', "%{$search}%"),
+                        ),
+                        isIndividual: true,
+                    ),
                 IconColumn::make('activo')
                     ->label('Activo')
                     ->boolean(),
