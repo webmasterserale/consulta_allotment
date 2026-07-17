@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Combinacion extends Model
 {
+    protected $connection = 'mysql_allotment';
+
     protected $table = 'combinaciones';
 
     protected $guarded = [];

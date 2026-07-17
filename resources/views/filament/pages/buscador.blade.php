@@ -48,6 +48,10 @@
         .bsc-badge { flex-shrink: 0; font-size: .72rem; font-weight: 700; color: #166534; background: #dcfce7; border-radius: 9999px; padding: .2rem .6rem; }
         .bsc-unidades { flex-shrink: 0; font-size: .78rem; color: #6b7280; }
         .bsc-vacio { text-align: center; color: #6b7280; padding: 1rem 0; font-size: 1.05rem; }
+        .bsc-dias { display: flex; gap: .6rem; flex-wrap: wrap; padding-top: .5rem; }
+        .bsc-dia-opcion { padding: .55rem 1rem; border: 2px solid #2563a8; border-radius: 9999px; color: #2563a8; font-weight: 600; cursor: pointer; background: #fff; font-size: .9rem; }
+        .dark .bsc-dia-opcion { background: transparent; border-color: #60a5fa; color: #93c5fd; }
+        .bsc-dia-opcion.activo { background: #2563a8 !important; color: #fff !important; }
     </style>
 
     <div
@@ -102,6 +106,18 @@
                     <span x-text="$wire.noches">{{ $noches }}</span>
                     <button type="button" @click="$wire.noches = Math.min(7, $wire.noches + 1)">+</button>
                 </div>
+            </div>
+            <div class="bsc-dias">
+                @foreach ($this->tiposDias as $clave => $etiqueta)
+                    <button
+                        type="button"
+                        class="bsc-dia-opcion"
+                        :class="$wire.tipoDias === '{{ $clave }}' && 'activo'"
+                        @click="$wire.tipoDias = '{{ $clave }}'"
+                    >
+                        {{ $etiqueta }}
+                    </button>
+                @endforeach
             </div>
         </div>
 

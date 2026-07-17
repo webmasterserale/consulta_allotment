@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetalleCombinacion extends Model
 {
+    protected $connection = 'mysql_allotment';
+
     protected $table = 'detalle_combinaciones';
 
     public $timestamps = false;

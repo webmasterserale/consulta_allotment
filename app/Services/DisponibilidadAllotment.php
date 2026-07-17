@@ -22,6 +22,9 @@ class DisponibilidadAllotment
      *
      * @return array<int, array{entra: string, sale: string, combinaciones: array}>
      */
+    /**
+     * @param  ?string  $tipoDias  'entre_semana' (dom-jue), 'fin_semana' (vie-sáb) o null para todos
+     */
     public function paquetes(
         int $hotel,
         string $mes, // formato 'Y-m'
@@ -29,6 +32,7 @@ class DisponibilidadAllotment
         int $adultos,
         int $ninos,
         ?string $canal = 'PTS',
+        ?string $tipoDias = null,
     ): array {
         $combos = $this->combinaciones->buscar($hotel, $adultos, $ninos);
 
@@ -116,6 +120,10 @@ class DisponibilidadAllotment
         $resultados = [];
 
         for ($dia = $desde; $dia->lte($finMes); $dia = $dia->addDay()) {
+            if ($tipoDias !== null && ! $this->coincideTipoDia($dia, $tipoDias)) {
+                continue;
+            }
+
             $entra = $dia->toDateString();
             $sale = $dia->addDays($noches)->toDateString();
 
@@ -182,6 +190,16 @@ class DisponibilidadAllotment
         }
 
         return $resultados;
+    }
+
+    /**
+     * Entre semana: domingo a jueves. Fin de semana: viernes y sábado.
+     */
+    private function coincideTipoDia(CarbonImmutable $dia, string $tipoDias): bool
+    {
+        $finDeSemana = in_array($dia->dayOfWeek, [CarbonImmutable::FRIDAY, CarbonImmutable::SATURDAY], true);
+
+        return $tipoDias === 'fin_semana' ? $finDeSemana : ! $finDeSemana;
     }
 
     /**

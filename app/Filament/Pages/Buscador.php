@@ -25,6 +25,12 @@ class Buscador extends Page
 
     private const MESES_LARGOS = [1 => 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
+    private const TIPOS_DIAS = [
+        'todos' => 'Todos',
+        'entre_semana' => 'Entre semana',
+        'fin_semana' => 'Fin de semana',
+    ];
+
     public int $hotel = 2;
 
     public string $mes = '';
@@ -34,6 +40,8 @@ class Buscador extends Page
     public int $adultos = 2;
 
     public int $ninos = 0;
+
+    public string $tipoDias = 'todos';
 
     public ?array $resultados = null;
 
@@ -47,6 +55,11 @@ class Buscador extends Page
             $this->noches = (int) ($filtros['noches'] ?? 1);
             $this->adultos = (int) ($filtros['adultos'] ?? 2);
             $this->ninos = (int) ($filtros['ninos'] ?? 0);
+            $this->tipoDias = (string) ($filtros['tipoDias'] ?? 'todos');
+        }
+
+        if (! array_key_exists($this->tipoDias, self::TIPOS_DIAS)) {
+            $this->tipoDias = 'todos';
         }
 
         if ($this->mes === '' || ! array_key_exists($this->mes, $this->meses)) {
@@ -62,6 +75,11 @@ class Buscador extends Page
     public function getDestinosProperty(): array
     {
         return BuscadorCombinaciones::DESTINOS;
+    }
+
+    public function getTiposDiasProperty(): array
+    {
+        return self::TIPOS_DIAS;
     }
 
     /**
@@ -102,18 +120,24 @@ class Buscador extends Page
             $this->hotel = 2;
         }
 
+        if (! array_key_exists($this->tipoDias, self::TIPOS_DIAS)) {
+            $this->tipoDias = 'todos';
+        }
+
         Cache::forever($this->claveFiltros(), [
             'hotel' => $this->hotel,
             'mes' => $this->mes,
             'noches' => $this->noches,
             'adultos' => $this->adultos,
             'ninos' => $this->ninos,
+            'tipoDias' => $this->tipoDias,
         ]);
 
         $paquetes = app(DisponibilidadAllotment::class)->paquetes(
             hotel: $this->hotel,
             mes: $this->mes,
             noches: $this->noches,
+            tipoDias: $this->tipoDias === 'todos' ? null : $this->tipoDias,
             adultos: $this->adultos,
             ninos: $this->ninos,
         );
