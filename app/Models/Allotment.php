@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Allotment extends Model
 {
@@ -32,5 +33,10 @@ class Allotment extends Model
             'fe7' => 'date',
             'update_estado' => 'datetime',
         ];
+    }
+
+    public function lugaruso(): BelongsTo
+    {
+        return $this->belongsTo(LugarUso::class, 'HOTEL', 'CVELUG');
     }
 }
